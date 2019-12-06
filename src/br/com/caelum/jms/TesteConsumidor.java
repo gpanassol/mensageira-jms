@@ -12,42 +12,42 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 public class TesteConsumidor {
 
 	public static void main(String[] args) throws Exception {
 		
-		//ABRE CONEXAO
 		InitialContext context = new InitialContext();
 		ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
-		Connection conn = factory.createConnection();
-		conn.start();
+		Connection connection = factory.createConnection();
+		connection.start();
 		
-		//RECEBE NOVAS MENSAGEM
-		Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE); //confirmar o recebimento da mensagem
-		Destination fila = (Destination) context.lookup("financeiro"); //queue.financeiro
+		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		Destination fila = (Destination) context.lookup("financeiro");
 		MessageConsumer consumer = session.createConsumer(fila);
+
+//		Message message = consumer.receive();
+//		System.out.println("Recebendo msg: "+ message);
 		
 		consumer.setMessageListener(new MessageListener() {
 			
 			@Override
 			public void onMessage(Message message) {
-
-				TextMessage text = (TextMessage) message;
+				TextMessage textMessage = (TextMessage) message;
 				try {
-					System.out.println(text.getText());
-					
+					System.out.println(textMessage.getText());
 				} catch (JMSException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
-
-		new Scanner(System.in).nextLine();
 		
-		session.close();
-		conn.close();
-		context.close();		
+		new Scanner(System.in).nextLine();
+
+        session.close();
+        connection.close();
+        context.close();
+		
 	}
 }
